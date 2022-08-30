@@ -24,6 +24,7 @@ type Props = {
 
 const Post = ({ post }: Props) => {
 	const [vote, setVote] = useState<boolean>();
+
 	const { data: session } = useSession();
 
 	const { data, loading } = useQuery(GET_ALL_VOTES_BY_POST_ID, {
@@ -36,7 +37,7 @@ const Post = ({ post }: Props) => {
 
 	useEffect(() => {
 		const votes: Vote[] = data?.getVotesByPostId;
-
+    // console.log(votes)
 		const vote = votes?.find(
 			(vote) => vote.username == session?.user?.name
 		)?.upvote;
@@ -49,19 +50,34 @@ const Post = ({ post }: Props) => {
 			toast("! You'll need to sign in to Vote!");
 			return;
 		}
-
+  
 		if (vote && isUpvote) return;
 		if (vote === false && !isUpvote) return;
 
-		console.log("voting...", isUpvote);
-
 		await addVote({
-      variables: {
-        post_id: post.id,
-        username: session.user?.name,
-        upvote: isUpvote
-      }
-    });
+			variables: {
+				post_id: post.id,
+				username: session.user?.name,
+				upvote: isUpvote,
+			},
+		});
+	};
+
+	const displayVotes = (data: any) => {
+    const votes: Vote[] = data?.getVotesByPostId;
+    // console.log(typeof votes[0]?.upvote)
+
+    const displayNumber = votes?.reduce(
+      (total, vote) => vote.upvote ? total += 1 : total -= 1, 0
+    )
+
+		if (votes?.length === 0) return 0;
+
+		if (displayNumber === 0) {
+			return votes[0]?.upvote ? 1 : -1;
+		}
+
+		return displayNumber;
 	};
 
 	if (!post)
@@ -84,12 +100,18 @@ const Post = ({ post }: Props) => {
 				>
 					<ArrowUpIcon
 						onClick={() => upVote(true)}
-						className={`voteButtons hover:text-blue-400 ${vote && 'text-blue-400'}`}
+						className={`voteButtons hover:text-blue-400 ${
+							vote && "text-blue-400"
+						}`}
 					/>
-					<p className="text-black font-bold text-xs">0</p>
+					<p className="text-black font-bold text-xs">
+						{displayVotes(data)}
+					</p>
 					<ArrowDownIcon
 						onClick={() => upVote(false)}
-						className={`voteButtons hover:text-red-400 ${vote === false && 'text-red-400'}`}
+						className={`voteButtons hover:text-red-400 ${
+							vote === false && "text-red-400"
+						}`}
 					/>
 				</div>
 

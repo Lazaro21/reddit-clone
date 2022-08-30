@@ -52,7 +52,7 @@ type Vote {
 			arguments: [{ name: "id", field: "post_id" }]
 		)
 	post_id: ID
-	upvote: String
+	upvote: Boolean
 	username: String
 }
 
@@ -118,6 +118,18 @@ type Query {
 			type: "postgresql"
 			query: """
 			select * from "vote" where "post_id" = $1
+			order by "vote"."created_at" desc
+			"""
+			configuration: "postgresql_config"
+		)
+
+	getSubredditListLimit(limit: Int!): [Subreddit]
+		@dbquery(
+			type: "postgresql"
+			query: """
+				select * from "subreddit"
+				order by "created_at" desc
+				limit $1
 			"""
 			configuration: "postgresql_config"
 		)

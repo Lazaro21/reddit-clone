@@ -33,13 +33,13 @@ const PostPage = () => {
 		formState: { errors },
 	} = useForm<FormData>();
 
-	console.log(data);
+	// console.log(data);
 
 	const post: Post = data?.getPostsListByPostId;
 
 	const onSubmit: SubmitHandler<FormData> = async (data) => {
 		// post comment here
-		console.log(data);
+		// console.log(data);
 
 		const notification = toast.loading("Posting your comment...");
 
